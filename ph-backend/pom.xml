@@ -84,7 +84,12 @@
 			<artifactId>jjwt-jackson</artifactId> <!-- Or jjwt-gson, depending on your JSON library -->
 			<version>0.11.5</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-web-api</artifactId>
+            <version>10.0.0</version>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>
