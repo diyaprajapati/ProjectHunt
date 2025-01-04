@@ -14,5 +14,5 @@ public class ProjectRequest {
     private String title;
     private String description;
     private String websiteLink;
-    private Set<Long> language;
+    private List<Long> language;
 }

@@ -3,6 +3,7 @@ package com.ProjectHunt.ph_backend.project;
 import com.ProjectHunt.ph_backend.language.LanguageService;
 import com.ProjectHunt.ph_backend.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public class ProjectController {
     }
 
     @PostMapping
-    public Project createProject(@RequestBody ProjectRequest projectRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<String> createProject(@RequestBody ProjectRequest projectRequest, @AuthenticationPrincipal User user) {
         Project project = Project.builder()
                 .user(user)
                 .name(projectRequest.getTitle())
@@ -35,6 +36,7 @@ public class ProjectController {
                 .websiteLink(projectRequest.getWebsiteLink())
                 .languages(languageService.getAllLanguagesById(projectRequest.getLanguage()))
                 .build();
-        return projectService.createProject(project);
+        projectService.createProject(project);
+        return ResponseEntity.ok("Go ahead, you did your project ");
     }
 }

@@ -13,6 +13,8 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @ToString
 @Builder
 public class Project {
@@ -35,7 +37,7 @@ public class Project {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "language_id")
     )
-    private Set<Language> languages;
+    private List<Language> languages;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 

@@ -13,11 +13,11 @@ public class LanguageService {
 
     private final LanguageRepository languageRepository;
 
-    public Set<Language> getAllLanguages() {
-        return (Set<Language>) languageRepository.findAll();
+    public List<Language> getAllLanguages() {
+        return languageRepository.findAll();
     }
 
-    public Set<Language> getAllLanguagesById(Set<Long> ids) {
+    public List<Language> getAllLanguagesById(List<Long> ids) {
         return languageRepository.findAllById(ids);
     }
 }
