@@ -33,21 +33,21 @@ const Index = () => {
         </div>
         <div className="flex gap-3">
           {!isAuthenticated ? (
-            <Button 
-              variant="secondary" 
+            <Button
+              variant="secondary"
               onClick={() => setShowAuthDialog(true)}
             >
               Sign In
             </Button>
           ) : (
             <div className="flex gap-3">
-              <Button 
+              <Button
                 variant="secondary"
                 onClick={() => navigate("/my-projects")}
               >
                 Your Projects
               </Button>
-              <Button 
+              <Button
                 variant="default"
                 onClick={() => setShowCreateProject(true)}
               >
@@ -67,10 +67,10 @@ const Index = () => {
           Explore cutting-edge software projects, support emerging innovations, and connect with creators.
         </p>
         <div className="relative max-w-2xl mx-auto">
-          <Input 
+          <Input
             type="search"
             placeholder="Search projects, tags or creators..."
-            className="w-full bg-gray-800/50 border-gray-700 text-white h-12 pl-4 pr-12"
+            className="w-full bg-gray-800/50 border-gray-700 text-white h-12 pl-4 pr-12 hover:border-blue-400/30"
           />
           <Sparkle className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
         </div>
@@ -85,21 +85,21 @@ const Index = () => {
             description="An amazing project description goes here"
             creator="John Doe"
             tags={["tech", "ai"]}
-            upvotes={42}
+            upvotes={0}
             onUpvote={handleUpvote}
           />
         </div>
       </section>
 
       {/* Dialogs */}
-      <AuthDialog 
-        open={showAuthDialog} 
+      <AuthDialog
+        open={showAuthDialog}
         onOpenChange={setShowAuthDialog}
-        onSuccess={() => {
-          setIsAuthenticated(true);
-          setShowAuthDialog(false);
-          toast.success("Successfully signed in!");
-        }}
+      // onSuccess={() => {
+      //   setIsAuthenticated(true);
+      //   setShowAuthDialog(false);
+      //   toast.success("Successfully signed in!");
+      // }}
       />
 
       <CreateProjectDialog

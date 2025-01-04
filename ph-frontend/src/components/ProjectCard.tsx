@@ -34,7 +34,7 @@ const ProjectCard = ({
             <h3 className="text-lg font-bold text-white">{title}</h3>
             <div className="flex gap-2">
               {tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="bg-blue-900/50 text-blue-300">
+                <Badge key={tag} variant="secondary" className="bg-blue-900/50 text-blue-300 hover:border-blue-900 hover:bg-transparent">
                   {tag}
                 </Badge>
               ))}
