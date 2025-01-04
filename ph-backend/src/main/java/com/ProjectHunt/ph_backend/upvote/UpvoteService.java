@@ -5,6 +5,7 @@ import com.ProjectHunt.ph_backend.project.ProjectRepository;
 import com.ProjectHunt.ph_backend.user.User;
 import com.ProjectHunt.ph_backend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,31 +15,34 @@ public class UpvoteService {
     private UpvoteRepository upvoteRepository;
 
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private ProjectRepository projectRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    public boolean toggleUpvote(Long projectId, User user) {
+        // Get the authenticated user's email from the security context
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
-    public boolean upvoteProject(Long projectId, Integer userId) {
-        // Check if the user has already upvoted the project
-        if (upvoteRepository.existsByProjectIdAndUserId(projectId, userId)) {
-            return false; // User has already upvoted
+        // Fetch the user by email
+//         userRepository.findByEmail(userEmail)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Project project = projectRepository.findById(projectId).get();
+
+        // Check if the user already upvoted the project
+        Upvote existingUpvote = upvoteRepository.findByProjectIdAndUserId(projectId, user.getId());
+
+        if (existingUpvote != null) {
+            // If upvote exists, remove it (toggle downvote)
+            upvoteRepository.delete(existingUpvote);
+            return false; // Upvote removed
         }
 
-        // Fetch the existing project and user from the database
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        // Create a new Upvote entity and set the project and user
-        Upvote upvote = new Upvote();
-        upvote.setProject(project);
-        upvote.setUser(user);
-
-        // Save the upvote to the repository
-        upvoteRepository.save(upvote);
-        return true;
+        // If upvote doesn't exist, create a new upvote
+        Upvote newUpvote = new Upvote();
+        newUpvote.setProject(project); // Assuming Project constructor accepts ID
+        newUpvote.setUser(user);
+        upvoteRepository.save(newUpvote);
+        return true; // Upvote added
     }
 }
