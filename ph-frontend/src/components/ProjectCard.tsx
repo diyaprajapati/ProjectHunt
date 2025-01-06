@@ -1,7 +1,7 @@
 import { Trash, ArrowUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+
 
 interface ProjectCardProps {
   id: number;
@@ -23,8 +23,8 @@ const ProjectCard = ({
   tags,
   upvotes,
   onUpvote,
+  showDelete = false,
   onDelete,
-  showDelete = false
 }: ProjectCardProps) => {
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 transition-all hover:bg-gray-800/70">
@@ -34,7 +34,11 @@ const ProjectCard = ({
             <h3 className="text-lg font-bold text-white">{title}</h3>
             <div className="flex gap-2">
               {tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="bg-blue-900/50 text-blue-300 hover:border-blue-900 hover:bg-transparent">
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="bg-blue-900/50 text-blue-300 hover:border-blue-900 hover:bg-transparent"
+                >
                   {tag}
                 </Badge>
               ))}
@@ -68,3 +72,4 @@ const ProjectCard = ({
 };
 
 export default ProjectCard;
+

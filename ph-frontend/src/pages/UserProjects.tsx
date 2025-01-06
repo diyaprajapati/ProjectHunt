@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Plus, Search, SortAsc } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,12 +11,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import axiosInstance from "@/lib/axios";
+import { toast } from "sonner";
 
 const UserProjects = () => {
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "popular">("newest");
-
   // Dummy data for demonstration
   const [projects, setProjects] = useState([
     {
@@ -29,16 +30,27 @@ const UserProjects = () => {
     },
   ]);
 
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axiosInstance.get("/projects");
+        console.log(response);
+        setProjects(response.data);
+      } catch (error) {
+        toast.error("Failed to load projects");
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+
   const handleDeleteProject = (projectId: number) => {
     setProjects(projects.filter(project => project.id !== projectId));
   };
 
   const filteredProjects = projects
-    .filter(project => 
-      project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .sort((a, b) => 
+    .sort((a, b) =>
       sortBy === "popular" ? b.upvotes - a.upvotes : b.id - a.id
     );
 
@@ -65,7 +77,7 @@ const UserProjects = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          
+
           <div className="flex gap-4 w-full sm:w-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -84,7 +96,7 @@ const UserProjects = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button 
+            <Button
               onClick={() => setShowCreateProject(true)}
               className="w-full sm:w-auto"
             >
@@ -99,12 +111,13 @@ const UserProjects = () => {
             <ProjectCard
               key={project.id}
               {...project}
-              onUpvote={() => {}}
+              // tags={project.l}
+              onUpvote={() => { }}
               onDelete={() => handleDeleteProject(project.id)}
               showDelete
             />
           ))}
-          
+
           {filteredProjects.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-400 text-lg">

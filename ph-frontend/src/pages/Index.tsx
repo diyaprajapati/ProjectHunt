@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowUp, ChevronLeft, ChevronRight, Code, Sparkle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,20 +8,59 @@ import { AuthDialog } from "@/components/AuthDialog";
 import ProjectCard from "@/components/ProjectCard";
 import CreateProjectDialog from "@/components/CreateProjectDialog";
 import { toast } from "sonner";
+import axiosInstance from "@/lib/axios";
+import axios from "axios";
 
 const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleUpvote = (projectId: number) => {
-    if (!isAuthenticated) {
-      setShowAuthDialog(true);
+  // Check if token exists and validate it on page load
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      // Set the token in axios default headers
+      axios.defaults.headers["Authorization"] = `Bearer ${token}`;
+
+      // Optionally, you can validate the token with the backend here
+      axios
+        .get("/api/auth/verify-token")
+        .then(() => setIsAuthenticated(true))
+        .catch(() => {
+          localStorage.removeItem("authToken"); // Remove token if invalid
+          setIsAuthenticated(false);
+        });
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
+
+
+  // Handle upvote
+  const handleUpvote = async (projectId: number) => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("You must be logged in to upvote.");
+      setShowAuthDialog(true); // Show login dialog
       return;
     }
-    toast.success("Project upvoted successfully!");
+
+    try {
+      const response = await axios.post(`http://localhost:8080/api/upvote/${projectId}`);
+      // console.log(response);
+      if (response.data.message === "Upvote added") {
+        toast.success("Upvote successful!");
+      } else {
+        toast.info("Upvote removed");
+      }
+    } catch (error) {
+      toast.error("Upvote failed");
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900">
@@ -95,11 +134,12 @@ const Index = () => {
       <AuthDialog
         open={showAuthDialog}
         onOpenChange={setShowAuthDialog}
-      // onSuccess={() => {
-      //   setIsAuthenticated(true);
-      //   setShowAuthDialog(false);
-      //   toast.success("Successfully signed in!");
-      // }}
+        onSuccess={(token) => {
+          localStorage.setItem("authToken", token); // Store token in localStorage
+          setIsAuthenticated(true);
+          setShowAuthDialog(false);
+          toast.success("Successfully signed in!");
+        }}
       />
 
       <CreateProjectDialog

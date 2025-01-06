@@ -1,11 +1,13 @@
 package com.ProjectHunt.ph_backend.project;
 
 import com.ProjectHunt.ph_backend.language.Language;
+import com.ProjectHunt.ph_backend.upvote.Upvote;
 import com.ProjectHunt.ph_backend.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +33,7 @@ public class Project {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "project_languages",
             joinColumns = @JoinColumn(name = "project_id"),
@@ -40,6 +42,15 @@ public class Project {
     private List<Language> languages;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Upvote> upvotes = new ArrayList<>();
+
+    // Other fields and methods
+
+    public int getUpvoteCount() {
+        return upvotes.size(); // Count the number of upvotes
+    }
 
     // Getters and setters
 }

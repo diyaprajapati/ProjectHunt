@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import axiosInstance from "@/lib/axios";
 
 interface CreateProjectDialogProps {
   open: boolean;
@@ -40,26 +41,43 @@ const CreateProjectDialog = ({ open, onOpenChange, onSuccess }: CreateProjectDia
     const formData = new FormData(e.target as HTMLFormElement);
     const data = Object.fromEntries(formData);
 
+    // try {
+    //   const response = await fetch('/api/projects', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //       title: data.title,
+    //       description: data.description,
+    //       websiteLink: data.websiteLink,
+    //       language: selectedLanguages,
+    //     }),
+    //   });
+
+    //   if (!response.ok) {
+    //     throw new Error('Failed to create project');
+    //   }
+
+    //   toast.success("Project created successfully!");
+    //   onSuccess();
+    // } catch (error) {
+    //   toast.error("Failed to create project");
+    // } finally {
+    //   setLoading(false);
+    // }
     try {
-      const response = await fetch('/api/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: data.title,
-          description: data.description,
-          websiteLink: data.websiteLink,
-          language: selectedLanguages,
-        }),
+      const response = await axiosInstance.post("/projects", {
+        title: data.title,
+        description: data.description,
+        websiteLink: data.websiteLink,
+        language: selectedLanguages,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create project');
+      if (response.status === 200) {
+        toast.success("Project created successfully!");
+        onSuccess();
       }
-
-      toast.success("Project created successfully!");
-      onSuccess();
     } catch (error) {
       toast.error("Failed to create project");
     } finally {
@@ -88,10 +106,10 @@ const CreateProjectDialog = ({ open, onOpenChange, onSuccess }: CreateProjectDia
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <Textarea 
-              id="description" 
-              name="description" 
-              required 
+            <Textarea
+              id="description"
+              name="description"
+              required
               className="min-h-[100px]"
             />
           </div>

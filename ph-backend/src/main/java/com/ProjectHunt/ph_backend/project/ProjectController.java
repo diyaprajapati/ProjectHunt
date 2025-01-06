@@ -20,8 +20,8 @@ public class ProjectController {
     private LanguageService languageService;
 
     @GetMapping
-    public List<Project> getProjects() {
-        return projectService.getAllProjects();
+    public ResponseEntity<List<Project>> getProjects() {
+        return ResponseEntity.ok(projectService.getAllProjects());
     }
 
     @PostMapping

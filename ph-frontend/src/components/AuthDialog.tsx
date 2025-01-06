@@ -14,9 +14,10 @@ import axios from 'axios';
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: (token: string) => void;
 }
 
-export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
+export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -57,6 +58,9 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         response = await login(email, password);
         localStorage.setItem('token', response.token);
         toast.success("Welcome back!");
+        if (onSuccess) {
+          onSuccess(response.token);
+        }
       } else {
         response = await register(email, password);
         toast.success("Account created successfully!");
