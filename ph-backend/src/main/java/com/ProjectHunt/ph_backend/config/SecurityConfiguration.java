@@ -25,19 +25,6 @@ public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http.cors(cors -> cors.configurationSource(corsConfigurationSource())) ;
-//        http.csrf(AbstractHttpConfigurer::disable);
-//        http.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll());
-//        http.authorizeHttpRequests(request -> request.requestMatchers("/api/auth/**", "/health").permitAll());
-//        http.authorizeHttpRequests(request -> request.anyRequest().authenticated());
-//        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//        http.authenticationProvider(authenticationProvider);
-//        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-//        return http.build();
-//    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));

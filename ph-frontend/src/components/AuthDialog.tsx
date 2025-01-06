@@ -9,6 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { login, register } from "@/services/api";
 import { toast } from "sonner";
+import axios from 'axios';
 
 interface AuthDialogProps {
   open: boolean;
@@ -19,6 +20,29 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  const apiClient = axios.create({
+    baseURL: "http://localhost:8080/api/auth",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  async function register(email: string, password: string) {
+    const response = await apiClient.post("/register", {
+      email,
+      password,
+    });
+    return response.data;
+  }
+
+  async function login(email: string, password: string) {
+    const response = await apiClient.post("/authenticate", {
+      email,
+      password,
+    });
+    return response.data;
+  }
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
@@ -26,19 +50,20 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const name = formData.get("name") as string;
 
     try {
+      let response;
       if (isLogin) {
-        await login(email, password);
+        response = await login(email, password);
+        localStorage.setItem('token', response.token);
         toast.success("Welcome back!");
       } else {
-        await register(name, email, password);
+        response = await register(email, password);
         toast.success("Account created successfully!");
       }
       onOpenChange(false);
     } catch (error) {
-      toast.error("Authentication failed. Please try again.");
+      toast.error(error.response?.data?.message || "Authentication failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -53,17 +78,6 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-5 py-4">
-          {!isLogin && (
-            <div className="space-y-2">
-              <Input
-                id="name"
-                name="name"
-                required
-                className="h-12 bg-[#262B38] border-0 text-white text-lg placeholder:text-gray-400 rounded-xl focus-visible:ring-1 focus-visible:ring-blue-500/50"
-                placeholder="Enter your name"
-              />
-            </div>
-          )}
           <div className="space-y-2">
             <Input
               id="email"
