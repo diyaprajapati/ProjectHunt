@@ -31,3 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
+ph-backend/src/main/resources/application.yml

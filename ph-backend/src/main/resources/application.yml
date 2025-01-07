@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/projecthunt
     username: postgres
-    password: diya555
+    password: root
     driver-class-name: org.postgresql.Driver
 
   jpa:
