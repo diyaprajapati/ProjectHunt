@@ -20,7 +20,7 @@ const ProjectCard = ({
   title,
   description,
   creator,
-  tags,
+  tags = [],
   upvotes,
   onUpvote,
   showDelete = false,

@@ -15,8 +15,18 @@ const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [projects, setProjects] = useState([]);
 
   const navigate = useNavigate();
+
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/projects");
+      setProjects(response.data); // Update projects state
+    } catch (error) {
+      toast.error("Failed to fetch projects");
+    }
+  };
 
   // Check if token exists and validate it on page load
   useEffect(() => {
@@ -38,24 +48,36 @@ const Index = () => {
     }
   }, []);
 
-
   // Handle upvote
   const handleUpvote = async (projectId: number) => {
     const token = localStorage.getItem("authToken");
     if (!token) {
       toast.error("You must be logged in to upvote.");
-      setShowAuthDialog(true); // Show login dialog
+      setShowAuthDialog(true);
       return;
     }
 
     try {
-      const response = await axios.post(`http://localhost:8080/api/upvote/${projectId}`);
-      // console.log(response);
-      if (response.data.message === "Upvote added") {
+      const response = await axios.post(
+        `http://localhost:8080/api/upvote/${projectId}`
+      );
+
+      const { message, upvoteCount } = response.data;
+
+      if (message === "Upvote added") {
         toast.success("Upvote successful!");
       } else {
         toast.info("Upvote removed");
       }
+
+      // Update the specific project's upvotes in the state
+      setProjects((prev) =>
+        prev.map((project) =>
+          project.id === projectId
+            ? { ...project, upvotes: upvoteCount }
+            : project
+        )
+      );
     } catch (error) {
       toast.error("Upvote failed");
     }
@@ -118,15 +140,18 @@ const Index = () => {
       {/* Projects Grid */}
       <section className="max-w-5xl mx-auto px-4 pb-20">
         <div className="space-y-4">
-          <ProjectCard
-            id={1}
-            title="Example Project"
-            description="An amazing project description goes here"
-            creator="John Doe"
-            tags={["tech", "ai"]}
-            upvotes={0}
-            onUpvote={handleUpvote}
-          />
+          {projects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              id={project.id}
+              title={project.title}
+              description={project.description}
+              creator={project.creator}
+              tags={project.tags}
+              upvotes={project.upvotes}
+              onUpvote={handleUpvote}
+            />
+          ))}
         </div>
       </section>
 
@@ -136,6 +161,7 @@ const Index = () => {
         onOpenChange={setShowAuthDialog}
         onSuccess={(token) => {
           localStorage.setItem("authToken", token); // Store token in localStorage
+          axios.defaults.headers["Authorization"] = `Bearer ${token}`;
           setIsAuthenticated(true);
           setShowAuthDialog(false);
           toast.success("Successfully signed in!");
@@ -147,6 +173,7 @@ const Index = () => {
         onOpenChange={setShowCreateProject}
         onSuccess={() => {
           setShowCreateProject(false);
+          fetchProjects();
           toast.success("Project submitted successfully!");
         }}
       />
