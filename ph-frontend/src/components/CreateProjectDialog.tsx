@@ -26,7 +26,7 @@ import axiosInstance from "@/lib/axios";
 interface CreateProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess: (newProject: any) => void;
 }
 
 const CreateProjectDialog = ({ open, onOpenChange, onSuccess }: CreateProjectDialogProps) => {
@@ -76,7 +76,7 @@ const CreateProjectDialog = ({ open, onOpenChange, onSuccess }: CreateProjectDia
 
       if (response.status === 200) {
         toast.success("Project created successfully!");
-        onSuccess();
+        onSuccess(response.data);
       }
     } catch (error) {
       toast.error("Failed to create project");

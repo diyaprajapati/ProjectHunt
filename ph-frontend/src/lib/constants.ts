@@ -7,6 +7,6 @@ export const PROGRAMMING_LANGUAGES = [
   { id: 6, name: "Ruby" },
   { id: 7, name: "Go" },
   { id: 8, name: "Rust" },
-  { id: 9, name: "PHP" },
-  { id: 10, name: "Swift" }
+  { id: 9, name: "CSS" },
+  { id: 10, name: "React JS" }
 ];
