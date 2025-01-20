@@ -3,6 +3,7 @@ package com.ProjectHunt.ph_backend.project;
 import com.ProjectHunt.ph_backend.language.Language;
 import com.ProjectHunt.ph_backend.upvote.Upvote;
 import com.ProjectHunt.ph_backend.user.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +18,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "user")
 @Builder
 public class Project {
 
@@ -31,6 +32,7 @@ public class Project {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

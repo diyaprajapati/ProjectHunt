@@ -13,43 +13,60 @@
 // } from "@/components/ui/dropdown-menu";
 // import axiosInstance from "@/lib/axios";
 // import { toast } from "sonner";
+// import axios from "axios";
 
 // const UserProjects = () => {
 //   const [showCreateProject, setShowCreateProject] = useState(false);
 //   const [searchQuery, setSearchQuery] = useState("");
 //   const [sortBy, setSortBy] = useState<"newest" | "popular">("newest");
-//   // Dummy data for demonstration
-//   const [projects, setProjects] = useState([
-//     {
-//       id: 1,
-//       title: "Example Project",
-//       description: "A sample project description",
-//       creator: "John Doe",
-//       tags: ["JavaScript", "React"],
-//       upvotes: 42,
-//     },
-//   ]);
+//   const [projects, setProjects] = useState([]);
+
+//   // Fetch projects from the backend
+//   // const fetchProjects = async () => {
+//   //   try {
+//   //     const response = await axiosInstance.get("/projects");
+//   //     const validProjects = response.data.filter(
+//   //       (project) => typeof project.title === "string"
+//   //     );
+//   //     setProjects(validProjects);
+//   //   } catch (error) {
+//   //     console.error("Error fetching projects:", error);
+//   //     toast.error("Failed to load projects");
+//   //   }
+//   // };bv
 
 //   useEffect(() => {
 //     const fetchProjects = async () => {
 //       try {
-//         const response = await axiosInstance.get("/projects");
-//         console.log(response);
+//         const response = await axios.get("/api/user/projects", {
+//           headers: {
+//             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+//           },
+//         });
 //         setProjects(response.data);
 //       } catch (error) {
-//         toast.error("Failed to load projects");
+//         console.error("Error fetching user projects:", error);
 //       }
 //     };
 
 //     fetchProjects();
 //   }, []);
 
-
-//   const handleDeleteProject = (projectId: number) => {
-//     setProjects(projects.filter(project => project.id !== projectId));
+//   const handleDeleteProject = async (projectId: number) => {
+//     try {
+//       await axiosInstance.delete(`/projects/${projectId}`);
+//       setProjects((prev) => prev.filter((project) => project.id !== projectId));
+//       toast.success("Project deleted successfully");
+//     } catch (error) {
+//       console.error("Error deleting project:", error);
+//       toast.error("Failed to delete project");
+//     }
 //   };
 
 //   const filteredProjects = projects
+//     .filter((project) =>
+//       project.title?.toLowerCase().includes(searchQuery.toLowerCase())
+//     )
 //     .sort((a, b) =>
 //       sortBy === "popular" ? b.upvotes - a.upvotes : b.id - a.id
 //     );
@@ -111,7 +128,6 @@
 //             <ProjectCard
 //               key={project.id}
 //               {...project}
-//               // tags={project.l}
 //               onUpvote={() => { }}
 //               onDelete={() => handleDeleteProject(project.id)}
 //               showDelete
@@ -133,9 +149,17 @@
 //       <CreateProjectDialog
 //         open={showCreateProject}
 //         onOpenChange={setShowCreateProject}
-//         onSuccess={() => {
+//         // onSuccess={(newProject) => {
+//         //   setProjects((prevProjects) => [...prevProjects, newProject]);
+//         //   setShowCreateProject(false);
+//         // }}
+//         onSuccess={(newProject) => {
+//           setProjects((prevProjects) => {
+//             console.log("Previous projects:", prevProjects); // Debugging
+//             console.log("New project:", newProject); // Debugging
+//             return [...prevProjects, newProject];
+//           });
 //           setShowCreateProject(false);
-//           // In a real app, we would refresh the projects list here
 //         }}
 //       />
 //     </div>
@@ -157,7 +181,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import axiosInstance from "@/lib/axios";
+import axios from "axios";
 import { toast } from "sonner";
 
 const UserProjects = () => {
@@ -165,28 +189,39 @@ const UserProjects = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "popular">("newest");
   const [projects, setProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch projects from the backend
-  const fetchProjects = async () => {
-    try {
-      const response = await axiosInstance.get("/projects");
-      const validProjects = response.data.filter(
-        (project) => typeof project.title === "string"
-      );
-      setProjects(validProjects);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      toast.error("Failed to load projects");
-    }
-  };
-
   useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setIsLoading(true);
+        console.log("Fetching projects from server...");
+        const response = await axios.get("http://localhost:8080/api/projects", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+        setProjects(response.data);
+        console.log("Projects fetched successfully from server");
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching user projects:", error);
+        toast.error("Failed to load projects");
+        setIsLoading(false);
+      }
+    };
+
     fetchProjects();
   }, []);
 
   const handleDeleteProject = async (projectId: number) => {
     try {
-      await axiosInstance.delete(`/projects/${projectId}`);
+      await axios.delete(`/api/projects/${projectId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
       setProjects((prev) => prev.filter((project) => project.id !== projectId));
       toast.success("Project deleted successfully");
     } catch (error) {
@@ -256,17 +291,19 @@ const UserProjects = () => {
         </div>
 
         <div className="space-y-4">
-          {filteredProjects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              {...project}
-              onUpvote={() => { }}
-              onDelete={() => handleDeleteProject(project.id)}
-              showDelete
-            />
-          ))}
-
-          {filteredProjects.length === 0 && (
+          {isLoading ? (
+            <p className="text-center text-gray-400">Loading projects...</p>
+          ) : filteredProjects.length > 0 ? (
+            filteredProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                {...project}
+                onUpvote={() => { }}
+                onDelete={() => handleDeleteProject(project.id)}
+                showDelete
+              />
+            ))
+          ) : (
             <div className="text-center py-12">
               <p className="text-gray-400 text-lg">
                 {searchQuery

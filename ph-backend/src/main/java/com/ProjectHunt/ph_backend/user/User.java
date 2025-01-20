@@ -63,6 +63,7 @@
 package com.ProjectHunt.ph_backend.user;
 
 import com.ProjectHunt.ph_backend.project.Project;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -95,6 +96,7 @@ public class User implements UserDetails {
     private Role role;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Project> projects;
 
     private String username;
