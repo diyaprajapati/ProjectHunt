@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Project {
   id: number;
@@ -48,24 +51,22 @@ const UserProjects: React.FC = () => {
   }, [projects, searchQuery, sortBy]);
 
   return (
-    <div className="p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 p-5">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-white">Your Projects</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-          + New Project
-        </button>
+        <h1 className="text-white font-bold text-4xl">Your Projects</h1>
+        <Button className="bg-blue-700 hover:bg-blue-800">+ New Project </Button>
       </div>
 
       {/* Search and Sort Section */}
       <div className="flex items-center gap-4 mb-4">
-        <input
+        <Input
           type="text"
           placeholder="Search your projects..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 px-4 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="bg-gray-800/50 border-gray-700 text-white h-12 pl-4 pr-12 hover:border-blue-400/30"
         />
-        <button
+        {/* <button
           onClick={() => setSortBy("newest")}
           className={`px-4 py-2 rounded ${sortBy === "newest"
             ? "bg-blue-600 text-white"
@@ -73,8 +74,27 @@ const UserProjects: React.FC = () => {
             }`}
         >
           Sort by Newest
-        </button>
-        <button
+        </button> */}
+        <Select>
+          <SelectTrigger className="w-[180px] bg-gray-700 text-white border border-gray-700">
+            <SelectValue placeholder="Filter" />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-700 border-none text-white">
+            <SelectGroup>
+              <SelectItem value="sort by newest" onSelect={() => setSortBy("newest")}
+                className={`px-4 py-2 rounded ${sortBy === "newest"
+                  ? "hover:bg-gray-400 hover:text-white"
+                  : "hover:bg-gray-400 hover:text-white"
+                  }`}>Sort by Newest</SelectItem>
+              <SelectItem value="sort by populer" onSelect={() => setSortBy("popular")}
+                className={`px-4 py-2 rounded ${sortBy === "popular"
+                  ? "hover:bg-gray-400 hover:text-white"
+                  : "hover:bg-gray-400 hover:text-white"
+                  }`}>Sort by Populer</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        {/* <button
           onClick={() => setSortBy("popular")}
           className={`px-4 py-2 rounded ${sortBy === "popular"
             ? "bg-blue-600 text-white"
@@ -82,29 +102,28 @@ const UserProjects: React.FC = () => {
             }`}
         >
           Sort by Popular
-        </button>
+        </button> */}
       </div>
 
       {/* Projects List */}
       {filteredProjects.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="flex flex-col gap-3">
           {filteredProjects.map((project) => (
             <div
               key={project.id}
-              className="bg-gray-800 p-4 rounded shadow hover:shadow-lg transition"
+              className="bg-gray-800 px-4 py-5 rounded-lg shadow hover:shadow-lg transition"
             >
-              <h2 className="text-lg font-bold text-white mb-2">
-                {project.name}
-              </h2>
-              <p className="text-gray-400 mb-4">{project.description}</p>
               <a
                 href={project.websiteLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-400 hover:underline"
               >
-                Visit Website
+                <h2 className="text-lg font-bold text-white mb-2 hover:text-blue-400">
+                  {project.name}
+                </h2>
               </a>
+              <p className="text-gray-400 text-base mb-4 font-semibold">{project.description}</p>
               <p className="text-gray-300 mt-2">Upvotes: {project.upvotes || 0}</p>
             </div>
           ))}
