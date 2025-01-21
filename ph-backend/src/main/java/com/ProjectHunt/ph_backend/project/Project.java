@@ -10,7 +10,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -36,11 +35,7 @@ public class Project {
     private User user;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "project_languages",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "language_id")
-    )
+    @JoinTable(name = "project_languages", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "language_id"))
     private List<Language> languages;
 
     private LocalDateTime createdAt = LocalDateTime.now();
