@@ -25,8 +25,8 @@ public class ProjectController {
 //        return ResponseEntity.ok(projectService.getAllProjects());
 //    }
 
-    @GetMapping
-    public List<ProjectDTO> getProjects() {
+    @GetMapping("/all")
+    public List<ProjectDTO> getAllProjects() {
         List<Project> projects = projectService.getAllProjects();
         return projects.stream().map(project -> new ProjectDTO(
                 project.getId(),
@@ -36,6 +36,18 @@ public class ProjectController {
         )).collect(Collectors.toList());
     }
 
+    @GetMapping("/user")
+    public List<ProjectDTO> getProjectsOfUser(@AuthenticationPrincipal User user) {
+        List<Project> projects = projectService.getProjectsByUserId(user.getId());
+        return projects.stream()
+                .map(project -> new ProjectDTO(
+                        project.getId(),
+                        project.getName(),
+                        project.getWebsiteLink(),
+                        project.getDescription()
+                ))
+                .collect(Collectors.toList());
+    }
 
     @PostMapping
     public ResponseEntity<String> createProject(@RequestBody ProjectRequest projectRequest, @AuthenticationPrincipal User user) {

@@ -21,19 +21,23 @@ const UserProjects: React.FC = () => {
 
   // Fetch projects from the server
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchUserProjects = async () => {
       try {
-        console.log("Fetching projects from server...");
-        const response = await axios.get("http://localhost:8080/api/projects");
+        const token = localStorage.getItem("authToken"); // Assuming the token is stored here
+        const response = await axios.get("http://localhost:8080/api/projects/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setProjects(response.data);
-        console.log("Projects fetched successfully:", response.data);
       } catch (error) {
-        console.error("Error fetching projects:", error);
+        console.error("Error fetching user projects:", error);
       }
     };
 
-    fetchProjects();
+    fetchUserProjects();
   }, []);
+
 
   // Filter and sort projects whenever projects, searchQuery, or sortBy changes
   useEffect(() => {
