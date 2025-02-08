@@ -31,7 +31,7 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(request -> {
             request.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
-            request.requestMatchers("/api/auth/**", "/health", "/api/projects").permitAll();
+            request.requestMatchers("/api/auth/**", "/health", "/api/projects", "/api/projects/all").permitAll();
             request.requestMatchers("/api/upvote/**").authenticated(); // Secure upvote endpoints
             request.anyRequest().authenticated();
         });

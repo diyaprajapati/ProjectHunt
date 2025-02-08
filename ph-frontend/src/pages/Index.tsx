@@ -13,70 +13,68 @@ const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [projects, setProjects] = useState([]); // All projects
-  const [userProjects, setUserProjects] = useState([]); // User-specific projects
+  const [projects, setProjects] = useState([]);
+  const [userProjects, setUserProjects] = useState([]);
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
+  // Fetch all projects regardless of authentication
+  const fetchAllProjects = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/projects/all");
+      setProjects(response.data);
+    } catch (error) {
+      console.error("Error fetching all projects:", error);
+      toast.error("Failed to load projects");
+    }
+  };
 
+  // Check authentication status and fetch projects on mount
+  useEffect(() => {
+    // Always fetch projects, regardless of auth status
+    fetchAllProjects();
+
+    // Check authentication
+    const token = localStorage.getItem("authToken");
     if (token) {
       axios.defaults.headers["Authorization"] = `Bearer ${token}`;
       axios
         .get("/api/auth/verify-token")
         .then(() => {
           setIsAuthenticated(true);
-          fetchAllProjects();
         })
         .catch(() => {
           localStorage.clear();
           setIsAuthenticated(false);
         });
-    } else {
-      setIsAuthenticated(false);
     }
   }, []);
 
-  const fetchAllProjects = async () => {
+  const handleUpvote = async (projectId) => {
+    if (!isAuthenticated) {
+      setShowAuthDialog(true);
+      return;
+    }
+
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axios.get("http://localhost:8080/api/projects/all", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setProjects(response.data);
+      await axios.post(
+        `http://localhost:8080/api/projects/${projectId}/upvote`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // Refresh projects after upvote
+      fetchAllProjects();
+      toast.success("Project upvoted successfully!");
     } catch (error) {
-      console.error("Error fetching all projects:", error);
+      console.error("Error upvoting project:", error);
+      toast.error("Failed to upvote project");
     }
   };
-
-
-
-  // On page load, validate token and fetch projects
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    const userId = localStorage.getItem("userId");
-
-    if (token) {
-      axios.defaults.headers["Authorization"] = `Bearer ${token}`;
-      axios
-        .get("/api/auth/verify-token")
-        .then(() => {
-          setIsAuthenticated(true);
-          fetchAllProjects(); // Fetch projects once authentication is verified
-        })
-        .catch(() => {
-          localStorage.removeItem("authToken");
-          localStorage.removeItem("token");
-          localStorage.removeItem("userId"); // Remove userId if invalid
-          setIsAuthenticated(false);
-        });
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900">
@@ -93,16 +91,10 @@ const Index = () => {
             </Button>
           ) : (
             <div className="flex gap-3">
-              <Button
-                variant="secondary"
-                onClick={() => navigate("/my-projects")}
-              >
+              <Button variant="secondary" onClick={() => navigate("/my-projects")}>
                 Your Projects
               </Button>
-              <Button
-                variant="default"
-                onClick={() => setShowCreateProject(true)}
-              >
+              <Button variant="default" onClick={() => setShowCreateProject(true)}>
                 Submit Project
               </Button>
             </div>
@@ -133,45 +125,23 @@ const Index = () => {
       {/* User Projects */}
       {isAuthenticated && userProjects.length > 0 && (
         <section className="max-w-5xl mx-auto px-4 pb-20">
-          <h3 className="text-xl text-white font-semibold mb-4">
-            Your Projects
-          </h3>
+          <h3 className="text-xl text-white font-semibold mb-4">Your Projects</h3>
           <div className="space-y-4">
             {userProjects.map((project) => (
               <ProjectCard
                 key={project.id}
                 id={project.id}
-                title={project.title}
-                description={project.description}
-                creator={project.creator}
-                tags={project.tags}
-                upvotes={project.upvotes}
-                onUpvote={function (id: number): void {
-                  throw new Error("Function not implemented.");
-                }} />
+                title={project.title || "Untitled Project"}
+                description={project.description || "No description available."}
+                creator={project.creator || "Unknown"}
+                tags={project.tags || []}
+                upvotes={project.upvotes || 0}
+                onUpvote={handleUpvote}
+              />
             ))}
           </div>
         </section>
       )}
-
-      {/* All Projects */}
-      {/* <section className="max-w-5xl mx-auto px-4 pb-20">
-        <h3 className="text-xl text-white font-semibold mb-4">All Projects</h3>
-        <div className="space-y-4">
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              id={project.id}
-              title={project.title}
-              description={project.description}
-              creator={project.creator}
-              tags={project.tags}
-              upvotes={project.upvotes} onUpvote={function (id: number): void {
-                throw new Error("Function not implemented.");
-              }} />
-          ))}
-        </div>
-      </section> */}
 
       {/* All Projects */}
       <section className="max-w-5xl mx-auto px-4 pb-20">
@@ -181,14 +151,12 @@ const Index = () => {
             <ProjectCard
               key={project.id}
               id={project.id}
-              title={project.title && project.title.trim() ? project.title : "Untitled Project"} // Fallback if title is missing or empty
-              description={project.description || "No description available."} // Fallback for description
-              creator={project.creator || "Unknown"} // Fallback for creator
-              tags={project.tags || []} // Default empty array for tags
-              upvotes={project.upvotes || 0} // Default 0 for upvotes
-              onUpvote={(id) => {
-                console.log(`Upvote clicked for project ID: ${id}`); // Placeholder for upvote functionality
-              }}
+              title={project.name || "Untitled Project"}
+              description={project.description || "No description available."}
+              creator={project.creator || "Unknown"}
+              tags={project.tags || []}
+              upvotes={project.upvotes || 0}
+              onUpvote={handleUpvote}
             />
           ))}
         </div>
