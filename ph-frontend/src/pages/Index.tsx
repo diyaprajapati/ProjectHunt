@@ -58,8 +58,8 @@ const Index = () => {
 
     try {
       const token = localStorage.getItem("authToken");
-      await axios.post(
-        `http://localhost:8080/api/projects/${projectId}/upvote`,
+      const response = await axios.post(
+        `http://localhost:8080/api/upvote/${projectId}`,  // Updated endpoint
         {},
         {
           headers: {
@@ -67,14 +67,60 @@ const Index = () => {
           },
         }
       );
-      // Refresh projects after upvote
-      fetchAllProjects();
-      toast.success("Project upvoted successfully!");
+
+      // Update the projects array with new upvote count
+      setProjects(projects.map(project => {
+        if (project.id === projectId) {
+          return {
+            ...project,
+            upvotes: response.data.upvoteCount
+          };
+        }
+        return project;
+      }));
+
+      toast.success(response.data.message);
     } catch (error) {
       console.error("Error upvoting project:", error);
       toast.error("Failed to upvote project");
     }
   };
+
+  // Add this function to fetch upvote status when user logs in
+  const fetchUpvoteStatuses = async () => {
+    if (!isAuthenticated) return;
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const updatedProjects = await Promise.all(
+        projects.map(async (project) => {
+          try {
+            const response = await axios.get(
+              `http://localhost:8080/api/upvote/${project.id}/status`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            return { ...project, isUpvoted: response.data };
+          } catch (error) {
+            return { ...project, isUpvoted: false };
+          }
+        })
+      );
+      setProjects(updatedProjects);
+    } catch (error) {
+      console.error("Error fetching upvote statuses:", error);
+    }
+  };
+
+  // Call this in your useEffect when authentication changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchUpvoteStatuses();
+    }
+  }, [isAuthenticated]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900">

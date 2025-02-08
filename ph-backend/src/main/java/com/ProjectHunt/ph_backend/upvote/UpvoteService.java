@@ -15,7 +15,7 @@ public class UpvoteService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    public boolean toggleUpvote(Long projectId, User user) {
+        public boolean toggleUpvote(Long projectId, User user) {
         // Validate user
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
@@ -41,4 +41,29 @@ public class UpvoteService {
         upvoteRepository.save(newUpvote);
         return true; // Upvote added
     }
+
+//    public boolean toggleUpvote(Long projectId, User user) {
+//        Project project = projectRepository.findById(projectId)
+//                .orElseThrow(() -> new RuntimeException("Project not found"));
+//
+//        // Check if upvote exists
+//        Optional<Upvote> existingUpvote = upvoteRepository.findByProjectAndUser(project, user);
+//
+//        if (existingUpvote.isPresent()) {
+//            // Remove upvote if it exists
+//            upvoteRepository.delete(existingUpvote.get());
+//            project.decrementUpvoteCount();
+//            projectRepository.save(project);
+//            return false;
+//        } else {
+//            // Add new upvote
+//            Upvote upvote = new Upvote();
+//            upvote.setProject(project);
+//            upvote.setUser(user);
+//            upvoteRepository.save(upvote);
+//            project.incrementUpvoteCount();
+//            projectRepository.save(project);
+//            return true;
+//        }
+//    }
 }

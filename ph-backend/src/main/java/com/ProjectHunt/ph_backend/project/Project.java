@@ -28,6 +28,7 @@ public class Project {
     private String name;
     private String websiteLink;
     private String description;
+//    private int upvoteCount = 0;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
