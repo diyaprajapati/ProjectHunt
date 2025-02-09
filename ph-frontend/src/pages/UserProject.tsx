@@ -6,8 +6,12 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { ArrowUp } from "lucide-react";
 import CreateProjectDialog from "@/components/CreateProjectDialog";
 import { toast } from "sonner";
+import ProjectCard from "@/components/ProjectCard";
 
 interface Project {
+  upvoteCount: number;
+  tags: any[];
+  createdBy: string;
   id: number;
   name: string;
   websiteLink: string;
@@ -41,8 +45,6 @@ const UserProjects: React.FC = () => {
     fetchUserProjects();
   }, []);
 
-
-
   // Filter and sort projects whenever projects, searchQuery, or sortBy changes
   useEffect(() => {
     const filtered = projects
@@ -58,6 +60,70 @@ const UserProjects: React.FC = () => {
     setFilteredProjects(filtered);
     console.log("Filtered and sorted projects:", filtered);
   }, [projects, searchQuery, sortBy]);
+
+  const handleUpvote = async (projectId) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.post(
+        `http://localhost:8080/api/upvote/${projectId}`,  // Updated endpoint
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update the projects array with new upvote count
+      setProjects(projects.map(project => {
+        if (project.id === projectId) {
+          return {
+            ...project,
+            upvoteCount: response.data.upvoteCount,
+            isUpvoted: response.data.isUpvoted
+          };
+        }
+        return project;
+      }));
+
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error("Error upvoting project:", error);
+      toast.error("Failed to upvote project");
+    }
+  };
+
+  // Add this function to fetch upvote status when user logs in
+  const fetchUpvoteStatuses = async () => {
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const updatedProjects = await Promise.all(
+        projects.map(async (project) => {
+          try {
+            const response = await axios.get(
+              `http://localhost:8080/api/upvote/${project.id}/status`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            return { ...project, isUpvoted: response.data.isUpvoted };
+          } catch (error) {
+            return { ...project, isUpvoted: false };
+          }
+        })
+      );
+      setProjects(updatedProjects);
+    } catch (error) {
+      console.error("Error fetching upvote statuses:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUpvoteStatuses();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 md:p-16 p-6">
@@ -89,41 +155,19 @@ const UserProjects: React.FC = () => {
       </div>
 
       {/* Projects List */}
-      {filteredProjects.length > 0 ? (
-        <div className="flex flex-col gap-3 justify-center self-center items-center">
-          {filteredProjects.map((project) => (
-            <div
-              key={project.id}
-              className="bg-gray-800/50 hover:bg-gray-800/70 px-4 py-5 rounded-lg shadow hover:shadow-lg transition md:w-[90%] w-full flex justify-between items-center"
-            >
-              <div>
-                <a
-                  href={project.websiteLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:underline"
-                >
-                  <h2 className="text-lg font-bold text-white mb-2 hover:text-blue-400">
-                    {project.name}
-                  </h2>
-                </a>
-                <p className="text-gray-400 text-base mb-4 font-semibold">{project.description}</p>
-              </div>
-              <div>
-                {/* <p className="text-gray-300 mt-2">Upvotes: {project.upvotes || 0}</p> */}
-                <div className="flex items-center gap-2 bg-gray-700/80 py-3 rounded-full px-4 hover:bg-gray-700/90 transition-all cursor-pointer">
-                  <ArrowUp className="text-white" />
-                  <p className="text-gray-300">{project.upvotes || 0}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-gray-400 text-center mt-8">
-          You haven't created any projects yet
-        </p>
-      )}
+      {projects.map((project) => (
+        <ProjectCard
+          key={project.id}
+          id={project.id}
+          title={project.name || "Untitled Project"}
+          websiteLink={project.websiteLink}
+          description={project.description || "No description available."}
+          creator={project.createdBy || "Unknown"}
+          tags={project.tags || []}
+          upvoteCount={project.upvoteCount || 0}
+          onUpvote={handleUpvote}
+        />
+      ))}
 
       <CreateProjectDialog
         open={showCreateProject}
