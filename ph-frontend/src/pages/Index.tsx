@@ -8,15 +8,24 @@ import ProjectCard from "@/components/ProjectCard";
 import CreateProjectDialog from "@/components/CreateProjectDialog";
 import { toast } from "sonner";
 import axios from "axios";
+import { LogoutAlertDialog } from "@/components/LogoutAlertDialog";
 
 const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [showCreateProject, setShowCreateProject] = useState(false);
+  // const [showCreateProject, setShowCreateProject] = useState(false);
+  const [logout, setLogOut] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [projects, setProjects] = useState([]);
   const [userProjects, setUserProjects] = useState([]);
 
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setProjects([]); // Clear projects
+    setUserProjects([]); // Clear user projects
+    navigate("/"); // Redirect to home
+  };
 
   const fetchAllProjects = async () => {
     try {
@@ -146,8 +155,11 @@ const Index = () => {
               <Button variant="secondary" onClick={() => navigate("/my-projects")}>
                 Your Projects
               </Button>
-              <Button variant="default" onClick={() => setShowCreateProject(true)}>
+              {/* <Button variant="default" onClick={() => setShowCreateProject(true)}>
                 Submit Project
+              </Button> */}
+              <Button variant="default" onClick={() => setLogOut(true)}>
+                Logout
               </Button>
             </div>
           )}
@@ -229,7 +241,7 @@ const Index = () => {
         }}
       />
 
-      <CreateProjectDialog
+      {/* <CreateProjectDialog
         open={showCreateProject}
         onOpenChange={setShowCreateProject}
         onSuccess={() => {
@@ -237,7 +249,14 @@ const Index = () => {
           fetchAllProjects();
           toast.success("Project submitted successfully!");
         }}
+      /> */}
+
+      <LogoutAlertDialog
+        open={logout}
+        onOpenChange={setLogOut}
+        onLogout={handleLogout}
       />
+
     </div>
   );
 };
