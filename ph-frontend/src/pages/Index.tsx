@@ -22,10 +22,32 @@ const Index = () => {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("token");
     setProjects([]); // Clear projects
     setUserProjects([]); // Clear user projects
     navigate("/"); // Redirect to home
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const expiration = payload.exp * 1000;
+      const timeLeft = expiration - Date.now();
+
+      if (timeLeft > 0) {
+        const timeout = setTimeout(() => {
+          handleLogout();
+          toast.warning("Session expired. Please log in again.");
+        }, timeLeft);
+        return () => clearTimeout(timeout); // Cleanup
+      } else {
+        handleLogout();
+      }
+    }
+  }, []);
+
 
   const fetchAllProjects = async () => {
     try {
@@ -223,6 +245,7 @@ const Index = () => {
               creator={project.createdBy || "Unknown"}
               tags={project.tags || []}
               upvoteCount={project.upvoteCount || 0}
+              isUpvoted={project.isUpvoted}
               onUpvote={handleUpvote}
             />
           ))}
