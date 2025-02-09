@@ -18,13 +18,18 @@ const Index = () => {
 
   const navigate = useNavigate();
 
-  // Fetch all projects regardless of authentication
   const fetchAllProjects = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/projects/all");
-      setProjects(response.data);
+
+      const mappedProjects = response.data.map((project: any) => {
+        return {
+          ...project,
+          upvotes: project.upvoteCount || 0
+        };
+      });
+      setProjects(mappedProjects);
     } catch (error) {
-      console.error("Error fetching all projects:", error);
       toast.error("Failed to load projects");
     }
   };
@@ -73,7 +78,8 @@ const Index = () => {
         if (project.id === projectId) {
           return {
             ...project,
-            upvotes: response.data.upvoteCount
+            upvoteCount: response.data.upvoteCount,
+            isUpvoted: response.data.isUpvoted
           };
         }
         return project;
@@ -103,7 +109,7 @@ const Index = () => {
                 },
               }
             );
-            return { ...project, isUpvoted: response.data };
+            return { ...project, isUpvoted: response.data.isUpvoted };
           } catch (error) {
             return { ...project, isUpvoted: false };
           }
@@ -181,7 +187,8 @@ const Index = () => {
                 description={project.description || "No description available."}
                 creator={project.creator || "Unknown"}
                 tags={project.tags || []}
-                upvotes={project.upvotes || 0}
+                upvoteCount={project.upvoteCount || 0}
+                isUpvoted={project.isUpvoted}
                 onUpvote={handleUpvote}
               />
             ))}
@@ -201,7 +208,7 @@ const Index = () => {
               description={project.description || "No description available."}
               creator={project.creator || "Unknown"}
               tags={project.tags || []}
-              upvotes={project.upvotes || 0}
+              upvoteCount={project.upvoteCount || 0}
               onUpvote={handleUpvote}
             />
           ))}

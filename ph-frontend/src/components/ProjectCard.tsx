@@ -10,7 +10,7 @@ interface ProjectCardProps {
   description: string;
   creator: string;
   tags?: string[];
-  upvotes: number;
+  upvoteCount: number;
   onUpvote: (id: number) => void;
   onDelete?: (id: number) => void;
   showDelete?: boolean;
@@ -24,7 +24,7 @@ const ProjectCard = React.memo(
     description,
     creator,
     tags = [],
-    upvotes,
+    upvoteCount,
     onUpvote,
     showDelete = false,
     onDelete,
@@ -84,7 +84,7 @@ const ProjectCard = React.memo(
               aria-label="Upvote project"
             >
               <ArrowUp className="h-5 w-5" />
-              <span className="font-medium">{upvotes}</span>
+              <span className="font-medium">{upvoteCount}</span>
             </button>
           </div>
         </div>

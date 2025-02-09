@@ -21,54 +21,69 @@ public class UpvoteController {
     @Autowired
     private ProjectRepository projectRepository;
 
-    // @PostMapping("/{projectId}")
-    // public ResponseEntity<String> toggleUpvote(@PathVariable Long projectId,
-    // @AuthenticationPrincipal User user) {
-    // // Check if the user is authenticated
-    // if (user == null) {
-    // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not
-    // authenticated");
-    // }
-    //
-    // try {
-    // // Call the service to toggle upvote
-    // boolean upvoted = upvoteService.toggleUpvote(projectId, user);
-    //
-    // // Return success message based on action
-    // if (upvoted) {
-    // return ResponseEntity.ok("Upvote added");
-    // } else {
-    // return ResponseEntity.ok("Upvote removed");
-    // }
-    // } catch (IllegalArgumentException e) {
-    // // Handle invalid projectId or other invalid inputs
-    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-    // } catch (Exception e) {
-    // // Handle any unexpected errors
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error
-    // occurred while toggling upvote");
-    // }
-    // }
+    @Autowired
+    private UpvoteRepository upvoteRepository;
+
     @PostMapping("/{projectId}")
-    public ResponseEntity<Map<String, Object>> toggleUpvote(@PathVariable Long projectId,
+    public ResponseEntity<?> toggleUpvote(
+            @PathVariable Long projectId,
             @AuthenticationPrincipal User user) {
-        boolean upvoted = upvoteService.toggleUpvote(projectId, user);
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        try {
+            boolean upvoted = upvoteService.toggleUpvote(projectId, user);
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", upvoted ? "Upvote added" : "Upvote removed");
-        response.put("upvoteCount", project.getUpvoteCount()); // Send updated count
-        response.put("isUpvoted", upvoted);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", upvoted ? "Upvote added" : "Upvote removed");
+            response.put("upvoteCount", project.getUpvoteCount());
+            response.put("isUpvoted", upvoted);
 
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "An error occurred while processing your request");
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
     }
 
-//    @GetMapping("/{projectId}/status")
-//    public ResponseEntity<Boolean> hasUserUpvoted(
-//            @PathVariable Long projectId,
-//            @AuthenticationPrincipal User user) {
-//        return ResponseEntity.ok(upvoteService.hasUserUpvoted(projectId, user));
-//    }
+    @GetMapping("/{projectId}/status")
+    public ResponseEntity<?> hasUserUpvoted(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal User user) {
+        try {
+            Upvote upvote = upvoteRepository.findByProjectIdAndUserId(projectId, user.getId());
+            Map<String, Object> response = new HashMap<>();
+            response.put("isUpvoted", upvote != null);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "An error occurred while checking upvote status");
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
+
+    @GetMapping("/project/{projectId}/count")
+    public ResponseEntity<?> getUpvoteCount(@PathVariable Long projectId) {
+        try {
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new RuntimeException("Project not found"));
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("upvoteCount", project.getUpvoteCount());
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "An error occurred while fetching upvote count");
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
 
 }

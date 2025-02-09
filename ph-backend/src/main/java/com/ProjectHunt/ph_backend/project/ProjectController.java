@@ -32,7 +32,8 @@ public class ProjectController {
                 project.getId(),
                 project.getName(),
                 project.getWebsiteLink(),
-                project.getDescription()
+                project.getDescription(),
+                project.getUpvoteCount()
         )).collect(Collectors.toList());
     }
 
@@ -44,7 +45,8 @@ public class ProjectController {
                         project.getId(),
                         project.getName(),
                         project.getWebsiteLink(),
-                        project.getDescription()
+                        project.getDescription(),
+                        project.getUpvoteCount()
                 ))
                 .collect(Collectors.toList());
     }

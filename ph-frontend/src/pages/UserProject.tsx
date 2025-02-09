@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUp } from "lucide-react";
+import CreateProjectDialog from "@/components/CreateProjectDialog";
+import { toast } from "sonner";
 
 interface Project {
   id: number;
@@ -18,25 +20,27 @@ const UserProjects: React.FC = () => {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<"newest" | "popular">("newest");
+  const [showCreateProject, setShowCreateProject] = useState(false);
 
   // Fetch projects from the server
-  useEffect(() => {
-    const fetchUserProjects = async () => {
-      try {
-        const token = localStorage.getItem("authToken"); // Assuming the token is stored here
-        const response = await axios.get("http://localhost:8080/api/projects/user", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Error fetching user projects:", error);
-      }
-    };
+  const fetchUserProjects = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.get("http://localhost:8080/api/projects/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setProjects(response.data);
+    } catch (error) {
+      console.error("Error fetching user projects:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchUserProjects();
   }, []);
+
 
 
   // Filter and sort projects whenever projects, searchQuery, or sortBy changes
@@ -59,7 +63,7 @@ const UserProjects: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 md:p-16 p-6">
       <div className="flex justify-between items-center mb-10">
         <h1 className="text-white font-bold text-4xl">Your Projects</h1>
-        <Button className="bg-blue-700 hover:bg-blue-800">+ New Project </Button>
+        <Button className="bg-blue-700 hover:bg-blue-800" onClick={() => setShowCreateProject(true)}>+ New Project </Button>
       </div>
 
       {/* Search and Sort Section */}
@@ -71,43 +75,17 @@ const UserProjects: React.FC = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="bg-gray-800/50 border-gray-700 text-white h-12 pl-4 pr-12 hover:border-blue-400/30"
         />
-        {/* <button
-          onClick={() => setSortBy("newest")}
-          className={`px-4 py-2 rounded ${sortBy === "newest"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-700 text-gray-300"
-            }`}
-        >
-          Sort by Newest
-        </button> */}
-        <Select>
+        <Select onValueChange={(value) => setSortBy(value as "newest" | "popular")}>
           <SelectTrigger className="w-[180px] bg-gray-700 text-white border border-gray-700">
             <SelectValue placeholder="Filter" />
           </SelectTrigger>
           <SelectContent className="bg-gray-700 border-none text-white">
             <SelectGroup>
-              <SelectItem value="sort by newest" onSelect={() => setSortBy("newest")}
-                className={`px-4 py-2 rounded ${sortBy === "newest"
-                  ? "hover:bg-gray-400 hover:text-white"
-                  : "hover:bg-gray-400 hover:text-white"
-                  }`}>Sort by Newest</SelectItem>
-              <SelectItem value="sort by populer" onSelect={() => setSortBy("popular")}
-                className={`px-4 py-2 rounded ${sortBy === "popular"
-                  ? "hover:bg-gray-400 hover:text-white"
-                  : "hover:bg-gray-400 hover:text-white"
-                  }`}>Sort by Populer</SelectItem>
+              <SelectItem value="newest">Sort by Newest</SelectItem>
+              <SelectItem value="popular">Sort by Popular</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
-        {/* <button
-          onClick={() => setSortBy("popular")}
-          className={`px-4 py-2 rounded ${sortBy === "popular"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-700 text-gray-300"
-            }`}
-        >
-          Sort by Popular
-        </button> */}
       </div>
 
       {/* Projects List */}
@@ -146,6 +124,16 @@ const UserProjects: React.FC = () => {
           You haven't created any projects yet
         </p>
       )}
+
+      <CreateProjectDialog
+        open={showCreateProject}
+        onOpenChange={setShowCreateProject}
+        onSuccess={() => {
+          setShowCreateProject(false);
+          fetchUserProjects();
+          toast.success("Project submitted successfully!");
+        }}
+      />
     </div>
   );
 };

@@ -15,55 +15,31 @@ public class UpvoteService {
     @Autowired
     private ProjectRepository projectRepository;
 
-        public boolean toggleUpvote(Long projectId, User user) {
-        // Validate user
+    public boolean toggleUpvote(Long projectId, User user) {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
 
-        // Validate project
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
-        // Check if the user already upvoted the project
         Upvote existingUpvote = upvoteRepository.findByProjectIdAndUserId(projectId, user.getId());
 
         if (existingUpvote != null) {
-            // If upvote exists, remove it (toggle downvote)
+            // Remove upvote
             upvoteRepository.delete(existingUpvote);
+            project.decrementUpvoteCount();
+            projectRepository.save(project);
             return false; // Upvote removed
+        } else {
+            // Add upvote
+            Upvote newUpvote = new Upvote();
+            newUpvote.setProject(project);
+            newUpvote.setUser(user);
+            upvoteRepository.save(newUpvote);
+            project.incrementUpvoteCount();
+            projectRepository.save(project);
+            return true; // Upvote added
         }
-
-        // If upvote doesn't exist, create a new upvote
-        Upvote newUpvote = new Upvote();
-        newUpvote.setProject(project);
-        newUpvote.setUser(user);
-        upvoteRepository.save(newUpvote);
-        return true; // Upvote added
     }
-
-//    public boolean toggleUpvote(Long projectId, User user) {
-//        Project project = projectRepository.findById(projectId)
-//                .orElseThrow(() -> new RuntimeException("Project not found"));
-//
-//        // Check if upvote exists
-//        Optional<Upvote> existingUpvote = upvoteRepository.findByProjectAndUser(project, user);
-//
-//        if (existingUpvote.isPresent()) {
-//            // Remove upvote if it exists
-//            upvoteRepository.delete(existingUpvote.get());
-//            project.decrementUpvoteCount();
-//            projectRepository.save(project);
-//            return false;
-//        } else {
-//            // Add new upvote
-//            Upvote upvote = new Upvote();
-//            upvote.setProject(project);
-//            upvote.setUser(user);
-//            upvoteRepository.save(upvote);
-//            project.incrementUpvoteCount();
-//            projectRepository.save(project);
-//            return true;
-//        }
-//    }
 }

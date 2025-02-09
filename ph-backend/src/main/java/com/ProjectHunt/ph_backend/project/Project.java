@@ -28,7 +28,12 @@ public class Project {
     private String name;
     private String websiteLink;
     private String description;
-//    private int upvoteCount = 0;
+
+    @Column(columnDefinition = "integer default 0")
+    private int upvoteCount = 0;
+
+    @Version
+    private Long version;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -48,6 +53,14 @@ public class Project {
 
     public int getUpvoteCount() {
         return upvotes.size(); // Count the number of upvotes
+    }
+
+    public void incrementUpvoteCount() {
+        this.upvoteCount++;
+    }
+
+    public void decrementUpvoteCount() {
+        this.upvoteCount--;
     }
 
     // Getters and setters
