@@ -41,37 +41,13 @@ const CreateProjectDialog = ({ open, onOpenChange, onSuccess }: CreateProjectDia
     const formData = new FormData(e.target as HTMLFormElement);
     const data = Object.fromEntries(formData);
 
-    // try {
-    //   const response = await fetch('/api/projects', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       title: data.title,
-    //       description: data.description,
-    //       websiteLink: data.websiteLink,
-    //       language: selectedLanguages,
-    //     }),
-    //   });
-
-    //   if (!response.ok) {
-    //     throw new Error('Failed to create project');
-    //   }
-
-    //   toast.success("Project created successfully!");
-    //   onSuccess();
-    // } catch (error) {
-    //   toast.error("Failed to create project");
-    // } finally {
-    //   setLoading(false);
-    // }
     try {
       const response = await axiosInstance.post("/projects", {
         title: data.title,
         description: data.description,
         websiteLink: data.websiteLink,
         language: selectedLanguages,
+        createdBy: data.createdBy,
       });
 
       if (response.status === 200) {
@@ -100,10 +76,14 @@ const CreateProjectDialog = ({ open, onOpenChange, onSuccess }: CreateProjectDia
           <DialogTitle>Submit Your Project</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* title */}
           <div className="space-y-2">
             <Label htmlFor="title">Project Title</Label>
             <Input id="title" name="title" required />
           </div>
+
+          {/* description */}
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
@@ -113,6 +93,8 @@ const CreateProjectDialog = ({ open, onOpenChange, onSuccess }: CreateProjectDia
               className="min-h-[100px]"
             />
           </div>
+
+          {/* languages */}
           <div className="space-y-2">
             <Label>Technologies</Label>
             <Popover open={openLanguages} onOpenChange={setOpenLanguages}>
@@ -157,10 +139,20 @@ const CreateProjectDialog = ({ open, onOpenChange, onSuccess }: CreateProjectDia
               </PopoverContent>
             </Popover>
           </div>
+
+          {/* website link */}
           <div className="space-y-2">
             <Label htmlFor="websiteLink">Website Link</Label>
             <Input id="websiteLink" name="websiteLink" type="url" required />
           </div>
+
+          {/* created by */}
+          <div className="space-y-2">
+            <Label htmlFor="createdBy">Created By</Label>
+            <Input id="createdBy" name="createdBy" type="text" required />
+          </div>
+
+          {/* submit button */}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Creating..." : "Create Project"}
           </Button>

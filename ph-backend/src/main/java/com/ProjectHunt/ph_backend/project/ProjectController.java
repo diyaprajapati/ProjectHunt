@@ -33,7 +33,8 @@ public class ProjectController {
                 project.getName(),
                 project.getWebsiteLink(),
                 project.getDescription(),
-                project.getUpvoteCount()
+                project.getUpvoteCount(),
+                project.getCreatedBy()
         )).collect(Collectors.toList());
     }
 
@@ -46,7 +47,8 @@ public class ProjectController {
                         project.getName(),
                         project.getWebsiteLink(),
                         project.getDescription(),
-                        project.getUpvoteCount()
+                        project.getUpvoteCount(),
+                        project.getCreatedBy()
                 ))
                 .collect(Collectors.toList());
     }
@@ -59,6 +61,7 @@ public class ProjectController {
                 .description(projectRequest.getDescription())
                 .websiteLink(projectRequest.getWebsiteLink())
                 .languages(languageService.getAllLanguagesById(projectRequest.getLanguage()))
+                .createdBy(projectRequest.getCreatedBy())
                 .build();
         projectService.createProject(project);
         return ResponseEntity.ok("Go ahead, you did your project ");

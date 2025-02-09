@@ -184,8 +184,9 @@ const Index = () => {
                 key={project.id}
                 id={project.id}
                 title={project.title || "Untitled Project"}
+                websiteLink={project.websiteLink}
                 description={project.description || "No description available."}
-                creator={project.creator || "Unknown"}
+                creator={project.createdBy || "Unknown"}
                 tags={project.tags || []}
                 upvoteCount={project.upvoteCount || 0}
                 isUpvoted={project.isUpvoted}
@@ -205,8 +206,9 @@ const Index = () => {
               key={project.id}
               id={project.id}
               title={project.name || "Untitled Project"}
+              websiteLink={project.websiteLink}
               description={project.description || "No description available."}
-              creator={project.creator || "Unknown"}
+              creator={project.createdBy || "Unknown"}
               tags={project.tags || []}
               upvoteCount={project.upvoteCount || 0}
               onUpvote={handleUpvote}

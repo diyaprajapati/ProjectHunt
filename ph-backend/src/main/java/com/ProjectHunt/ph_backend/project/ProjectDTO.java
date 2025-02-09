@@ -13,14 +13,16 @@ public class ProjectDTO {
     private String description;
     private String websiteLink;
     private int upvoteCount;
+    private String createdBy;
 
-    public ProjectDTO(Long id, String name, String websiteLink, String description, int upvoteCount) {
+    public ProjectDTO(Long id, String name, String websiteLink, String description, int upvoteCount, String createdBy) {
         super();
         this.id = id;
         this.name = name;
         this.description = description;
         this.websiteLink = websiteLink;
         this.upvoteCount = upvoteCount;
+        this.createdBy = createdBy;
     }
 
 }

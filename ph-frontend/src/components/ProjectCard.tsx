@@ -8,6 +8,7 @@ interface ProjectCardProps {
   id: number;
   title: string;
   description: string;
+  websiteLink: string;
   creator: string;
   tags?: string[];
   upvoteCount: number;
@@ -22,6 +23,7 @@ const ProjectCard = React.memo(
     id,
     title,
     description,
+    websiteLink,
     creator,
     tags = [],
     upvoteCount,
@@ -36,9 +38,16 @@ const ProjectCard = React.memo(
           {/* Left section with title, description, tags */}
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-bold text-white">
-                {title || "Untitled Project"}
-              </h3>
+              <a
+                href={websiteLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:underline"
+              >
+                <h3 className="text-lg font-bold text-white">
+                  {title || "Untitled Project"}
+                </h3>
+              </a>
               {tags.length > 0 && (
                 <div className="flex gap-2">
                   {tags.map((tag) => (

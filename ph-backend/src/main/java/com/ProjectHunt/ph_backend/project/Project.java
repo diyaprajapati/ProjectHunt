@@ -32,6 +32,9 @@ public class Project {
     @Column(columnDefinition = "integer default 0")
     private int upvoteCount = 0;
 
+    @Column(name = "createdBy")
+    private String createdBy;
+
     @Version
     private Long version;
 
