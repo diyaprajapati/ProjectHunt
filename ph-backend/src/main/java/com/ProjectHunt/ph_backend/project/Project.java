@@ -43,7 +43,7 @@ public class Project {
     @JsonBackReference
     private User user;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "project_languages", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "language_id"))
     private List<Language> languages = new ArrayList<>();
 
