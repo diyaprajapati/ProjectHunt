@@ -221,7 +221,7 @@ const Index = () => {
                 websiteLink={project.websiteLink}
                 description={project.description || "No description available."}
                 creator={project.createdBy || "Unknown"}
-                tags={project.tags || []}
+                languages={project.languages?.map(lang => lang.name) || []}
                 upvoteCount={project.upvoteCount || 0}
                 isUpvoted={project.isUpvoted}
                 onUpvote={handleUpvote}
@@ -243,7 +243,7 @@ const Index = () => {
               websiteLink={project.websiteLink}
               description={project.description || "No description available."}
               creator={project.createdBy || "Unknown"}
-              tags={project.tags || []}
+              languages={project.languages?.map(lang => lang.name) || []}
               upvoteCount={project.upvoteCount || 0}
               isUpvoted={project.isUpvoted}
               onUpvote={handleUpvote}

@@ -10,7 +10,8 @@ import ProjectCard from "@/components/ProjectCard";
 
 interface Project {
   upvoteCount: number;
-  tags: any[];
+  // tags?: string[];
+  languages?: { id: number; name: string; }[];
   createdBy: string;
   id: number;
   name: string;
@@ -35,6 +36,7 @@ const UserProjects: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log(response.data)
       setProjects(response.data);
     } catch (error) {
       console.error("Error fetching user projects:", error);
@@ -163,7 +165,7 @@ const UserProjects: React.FC = () => {
           websiteLink={project.websiteLink}
           description={project.description || "No description available."}
           creator={project.createdBy || "Unknown"}
-          tags={project.tags || []}
+          languages={project.languages?.map(lang => lang.name) || []}
           upvoteCount={project.upvoteCount || 0}
           onUpvote={handleUpvote}
         />

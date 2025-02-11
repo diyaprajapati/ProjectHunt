@@ -10,7 +10,7 @@ interface ProjectCardProps {
   description: string;
   websiteLink: string;
   creator: string;
-  tags?: string[];
+  languages?: { id: number; name: string; }[];
   upvoteCount: number;
   onUpvote: (id: number) => void;
   onDelete?: (id: number) => void;
@@ -25,7 +25,7 @@ const ProjectCard = React.memo(
     description,
     websiteLink,
     creator,
-    tags = [],
+    languages = [],
     upvoteCount,
     onUpvote,
     showDelete = false,
@@ -48,15 +48,15 @@ const ProjectCard = React.memo(
                   {title || "Untitled Project"}
                 </h3>
               </a>
-              {tags.length > 0 && (
+              {languages.length > 0 && (
                 <div className="flex gap-2">
-                  {tags.map((tag) => (
+                  {languages.map((lang) => (
                     <Badge
-                      key={tag}
+                      key={lang.id}
                       variant="secondary"
                       className="bg-blue-900/50 text-blue-300 hover:border-blue-900 hover:bg-transparent"
                     >
-                      {tag}
+                      {lang.name}
                     </Badge>
                   ))}
                 </div>

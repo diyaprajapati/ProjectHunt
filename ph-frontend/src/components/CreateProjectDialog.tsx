@@ -34,6 +34,33 @@ const CreateProjectDialog = ({ open, onOpenChange, onSuccess }: CreateProjectDia
   const [selectedLanguages, setSelectedLanguages] = useState<number[]>([]);
   const [openLanguages, setOpenLanguages] = useState(false);
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+
+  //   const formData = new FormData(e.target as HTMLFormElement);
+  //   const data = Object.fromEntries(formData);
+
+  //   try {
+  //     const response = await axiosInstance.post("/projects", {
+  //       title: data.title,
+  //       description: data.description,
+  //       websiteLink: data.websiteLink,
+  //       language: selectedLanguages,
+  //       createdBy: data.createdBy,
+  //     });
+
+  //     if (response.status === 200) {
+  //       toast.success("Project created successfully!");
+  //       onSuccess(response.data);
+  //     }
+  //   } catch (error) {
+  //     toast.error("Failed to create project");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -46,15 +73,19 @@ const CreateProjectDialog = ({ open, onOpenChange, onSuccess }: CreateProjectDia
         title: data.title,
         description: data.description,
         websiteLink: data.websiteLink,
-        language: selectedLanguages,
+        language: selectedLanguages, // This is correctly sending array of language IDs
         createdBy: data.createdBy,
       });
 
       if (response.status === 200) {
+        console.log("Created project:", response.data); // Debug log
         toast.success("Project created successfully!");
         onSuccess(response.data);
+        setSelectedLanguages([]); // Reset selected languages
+        onOpenChange(false); // Close dialog
       }
     } catch (error) {
+      console.error("Error creating project:", error); // Debug log
       toast.error("Failed to create project");
     } finally {
       setLoading(false);
