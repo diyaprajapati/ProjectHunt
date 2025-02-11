@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AuthDialog } from "@/components/AuthDialog";
 import ProjectCard from "@/components/ProjectCard";
-import CreateProjectDialog from "@/components/CreateProjectDialog";
+// import CreateProjectDialog from "@/components/CreateProjectDialog";
 import { toast } from "sonner";
 import axios from "axios";
 import { LogoutAlertDialog } from "@/components/LogoutAlertDialog";
@@ -17,6 +17,7 @@ const Index = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [projects, setProjects] = useState([]);
   const [userProjects, setUserProjects] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(""); // Added for search
 
   const navigate = useNavigate();
 
@@ -48,15 +49,14 @@ const Index = () => {
     }
   }, []);
 
-
   const fetchAllProjects = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/projects/all");
 
-      const mappedProjects = response.data.map((project: any) => {
+      const mappedProjects = response.data.map((project) => {
         return {
           ...project,
-          upvotes: project.upvoteCount || 0
+          upvotes: project.upvoteCount || 0,
         };
       });
       setProjects(mappedProjects);
@@ -65,12 +65,9 @@ const Index = () => {
     }
   };
 
-  // Check authentication status and fetch projects on mount
   useEffect(() => {
-    // Always fetch projects, regardless of auth status
     fetchAllProjects();
 
-    // Check authentication
     const token = localStorage.getItem("authToken");
     if (token) {
       axios.defaults.headers["Authorization"] = `Bearer ${token}`;
@@ -95,7 +92,7 @@ const Index = () => {
     try {
       const token = localStorage.getItem("authToken");
       const response = await axios.post(
-        `http://localhost:8080/api/upvote/${projectId}`,  // Updated endpoint
+        `http://localhost:8080/api/upvote/${projectId}`,
         {},
         {
           headers: {
@@ -104,17 +101,18 @@ const Index = () => {
         }
       );
 
-      // Update the projects array with new upvote count
-      setProjects(projects.map(project => {
-        if (project.id === projectId) {
-          return {
-            ...project,
-            upvoteCount: response.data.upvoteCount,
-            isUpvoted: response.data.isUpvoted
-          };
-        }
-        return project;
-      }));
+      setProjects(
+        projects.map((project) => {
+          if (project.id === projectId) {
+            return {
+              ...project,
+              upvoteCount: response.data.upvoteCount,
+              isUpvoted: response.data.isUpvoted,
+            };
+          }
+          return project;
+        })
+      );
 
       toast.success(response.data.message);
     } catch (error) {
@@ -123,7 +121,6 @@ const Index = () => {
     }
   };
 
-  // Add this function to fetch upvote status when user logs in
   const fetchUpvoteStatuses = async () => {
     if (!isAuthenticated) return;
 
@@ -152,16 +149,24 @@ const Index = () => {
     }
   };
 
-  // Call this in your useEffect when authentication changes
   useEffect(() => {
     if (isAuthenticated) {
       fetchUpvoteStatuses();
     }
   }, [isAuthenticated]);
 
+  // Filtered projects based on search query
+  const filteredProjects = projects.filter(
+    (project) =>
+      project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (project.description &&
+        project.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (project.createdBy &&
+        project.createdBy.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900">
-      {/* Header */}
       <header className="flex justify-between items-center px-4 py-4 md:px-8">
         <div className="flex items-center gap-3">
           <Code className="text-blue-500 h-8 w-8" />
@@ -188,7 +193,6 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
       <section className="text-center px-4 py-12 md:py-20">
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
           Discover & Upvote <span className="text-blue-500">Innovative</span>{" "}
@@ -202,40 +206,18 @@ const Index = () => {
           <Input
             type="search"
             placeholder="Search projects, tags or creators..."
+            value={searchQuery} // Added binding
+            onChange={(e) => setSearchQuery(e.target.value)} // Added handler
             className="w-full bg-gray-800/50 border-gray-700 text-white h-12 pl-4 pr-12 hover:border-blue-400/30"
           />
           <Sparkle className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
         </div>
       </section>
 
-      {/* User Projects */}
-      {isAuthenticated && userProjects.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 pb-20">
-          <h3 className="text-xl text-white font-semibold mb-4">Your Projects</h3>
-          <div className="space-y-4">
-            {userProjects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                id={project.id}
-                title={project.title || "Untitled Project"}
-                websiteLink={project.websiteLink}
-                description={project.description || "No description available."}
-                creator={project.createdBy || "Unknown"}
-                languages={project.languages?.map(lang => lang.name) || []}
-                upvoteCount={project.upvoteCount || 0}
-                isUpvoted={project.isUpvoted}
-                onUpvote={handleUpvote}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* All Projects */}
       <section className="max-w-5xl mx-auto px-4 pb-20">
         <h3 className="text-xl text-white font-semibold mb-4">All Projects</h3>
         <div className="space-y-4">
-          {projects.map((project) => (
+          {filteredProjects.map((project) => (
             <ProjectCard
               key={project.id}
               id={project.id}
@@ -243,7 +225,7 @@ const Index = () => {
               websiteLink={project.websiteLink}
               description={project.description || "No description available."}
               creator={project.createdBy || "Unknown"}
-              languages={project.languages?.map(lang => lang.name) || []}
+              languages={project.languages?.map((lang) => lang.name) || []}
               upvoteCount={project.upvoteCount || 0}
               isUpvoted={project.isUpvoted}
               onUpvote={handleUpvote}
@@ -252,7 +234,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Dialogs */}
       <AuthDialog
         open={showAuthDialog}
         onOpenChange={setShowAuthDialog}
@@ -264,22 +245,11 @@ const Index = () => {
         }}
       />
 
-      {/* <CreateProjectDialog
-        open={showCreateProject}
-        onOpenChange={setShowCreateProject}
-        onSuccess={() => {
-          setShowCreateProject(false);
-          fetchAllProjects();
-          toast.success("Project submitted successfully!");
-        }}
-      /> */}
-
       <LogoutAlertDialog
         open={logout}
         onOpenChange={setLogOut}
         onLogout={handleLogout}
       />
-
     </div>
   );
 };
