@@ -15,15 +15,15 @@ public class ProjectService {
         return projectRepository.findAll();
     }
 
-//    public Project createProject(Project project) {
-//        return projectRepository.save(project);
-//    }
-public Project createProject(Project project, List<Language> languages) {
-    if (languages != null && !languages.isEmpty()) {
-        project.setLanguages(languages);
+    public Project createProject(Project project) {
+        return projectRepository.save(project);
     }
-    return projectRepository.save(project);
-}
+//public Project createProject(Project project, List<Language> languages) {
+//    if (languages != null && !languages.isEmpty()) {
+//        project.setLanguages(languages);
+//    }
+//    return projectRepository.save(project);
+//}
 
     public List<Project> getProjectsByUserId(Integer userId) {
         return projectRepository.findByUserId(userId);
