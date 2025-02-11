@@ -82,7 +82,7 @@ public class ProjectController {
                 .languages(languages)  // Ensure languages are set here
                 .createdBy(projectRequest.getCreatedBy())
                 .build();
-        projectService.createProject(project);
+        projectService.createProject(projectRequest, user);
         return ResponseEntity.ok("Project created successfully!");
     }
 
