@@ -10,7 +10,6 @@ import ProjectCard from "@/components/ProjectCard";
 
 interface Project {
   upvoteCount: number;
-  // tags?: string[];
   languages?: { id: number; name: string; }[];
   createdBy: string;
   id: number;
@@ -158,7 +157,7 @@ const UserProjects: React.FC = () => {
 
       <div className="flex flex-col gap-3 pt-2">
         {/* Projects List */}
-        {projects.map((project) => (
+        {filteredProjects.map((project) => (
           <ProjectCard
             key={project.id}
             id={project.id}
