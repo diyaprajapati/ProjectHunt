@@ -27,6 +27,8 @@ const Index = () => {
     localStorage.removeItem("token");
     setProjects([]); // Clear projects
     setUserProjects([]); // Clear user projects
+
+    fetchAllProjects();
     navigate("/"); // Redirect to home
   };
 
