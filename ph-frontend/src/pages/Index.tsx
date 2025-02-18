@@ -225,7 +225,7 @@ const Index = () => {
               websiteLink={project.websiteLink}
               description={project.description || "No description available."}
               creator={project.createdBy || "Unknown"}
-              languages={project.languages?.map((lang) => lang.name) || []}
+              languages={project.languages || []}
               upvoteCount={project.upvoteCount || 0}
               isUpvoted={project.isUpvoted}
               onUpvote={handleUpvote}

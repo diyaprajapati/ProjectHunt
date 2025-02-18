@@ -156,20 +156,22 @@ const UserProjects: React.FC = () => {
         </Select>
       </div>
 
-      {/* Projects List */}
-      {projects.map((project) => (
-        <ProjectCard
-          key={project.id}
-          id={project.id}
-          title={project.name || "Untitled Project"}
-          websiteLink={project.websiteLink}
-          description={project.description || "No description available."}
-          creator={project.createdBy || "Unknown"}
-          languages={project.languages?.map(lang => lang.name) || []}
-          upvoteCount={project.upvoteCount || 0}
-          onUpvote={handleUpvote}
-        />
-      ))}
+      <div className="flex flex-col gap-3 pt-2">
+        {/* Projects List */}
+        {projects.map((project) => (
+          <ProjectCard
+            key={project.id}
+            id={project.id}
+            title={project.name || "Untitled Project"}
+            websiteLink={project.websiteLink}
+            description={project.description || "No description available."}
+            creator={project.createdBy || "Unknown"}
+            languages={project.languages || []}
+            upvoteCount={project.upvoteCount || 0}
+            onUpvote={handleUpvote}
+          />
+        ))}
+      </div>
 
       <CreateProjectDialog
         open={showCreateProject}

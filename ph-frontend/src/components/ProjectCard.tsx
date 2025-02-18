@@ -54,7 +54,7 @@ const ProjectCard = React.memo(
                     <Badge
                       key={lang.id}
                       variant="secondary"
-                      className="bg-blue-900/50 text-blue-300 hover:border-blue-900 hover:bg-transparent"
+                      className="bg-blue-900/50 text-blue-200 hover:border-blue-900 hover:bg-transparent"
                     >
                       {lang.name}
                     </Badge>
