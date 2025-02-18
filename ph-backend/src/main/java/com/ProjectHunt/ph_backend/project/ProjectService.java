@@ -1,6 +1,7 @@
 package com.ProjectHunt.ph_backend.project;
 
 import com.ProjectHunt.ph_backend.language.Language;
+import com.ProjectHunt.ph_backend.language.LanguageService;
 import com.ProjectHunt.ph_backend.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
