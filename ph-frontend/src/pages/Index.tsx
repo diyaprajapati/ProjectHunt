@@ -53,7 +53,7 @@ const Index = () => {
 
   const fetchAllProjects = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/projects/all");
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/projects/all`);
 
       const mappedProjects = response.data.map((project) => {
         return {
@@ -94,7 +94,7 @@ const Index = () => {
     try {
       const token = localStorage.getItem("authToken");
       const response = await axios.post(
-        `http://localhost:8080/api/upvote/${projectId}`,
+        `${import.meta.env.VITE_BASE_URL}/upvote/${projectId}`,
         {},
         {
           headers: {
@@ -132,7 +132,7 @@ const Index = () => {
         projects.map(async (project) => {
           try {
             const response = await axios.get(
-              `http://localhost:8080/api/upvote/${project.id}/status`,
+              `${import.meta.env.VITE_BASE_URL}/upvote/${project.id}/status`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,

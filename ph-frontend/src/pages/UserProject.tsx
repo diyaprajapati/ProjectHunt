@@ -30,7 +30,7 @@ const UserProjects: React.FC = () => {
   const fetchUserProjects = async () => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axios.get("http://localhost:8080/api/projects/user", {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/projects/user`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -66,7 +66,7 @@ const UserProjects: React.FC = () => {
     try {
       const token = localStorage.getItem("authToken");
       const response = await axios.post(
-        `http://localhost:8080/api/upvote/${projectId}`,  // Updated endpoint
+        `${import.meta.env.VITE_BASE_URL}/upvote/${projectId}`,
         {},
         {
           headers: {
@@ -103,7 +103,7 @@ const UserProjects: React.FC = () => {
         projects.map(async (project) => {
           try {
             const response = await axios.get(
-              `http://localhost:8080/api/upvote/${project.id}/status`,
+              `${import.meta.env.VITE_BASE_URL}/upvote/${project.id}/status`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
