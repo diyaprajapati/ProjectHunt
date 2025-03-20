@@ -84,9 +84,9 @@ export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
     const password = formData.get("password") as string;
 
     try {
-      let response;
       if (isLogin) {
-        response = await login(email, password);
+        // Login flow
+        const response = await login(email, password);
         if (response.token && isTokenValid(response.token)) {
           localStorage.setItem("token", response.token);
           setIsLoggedIn(true);
@@ -98,8 +98,20 @@ export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
           throw new Error("Invalid token received.");
         }
       } else {
-        response = await register(email, password);
+        // Registration flow
+        await register(email, password);
         toast.success("Account created successfully!");
+
+        // Auto-login after successful registration
+        const loginResponse = await login(email, password);
+        if (loginResponse.token && isTokenValid(loginResponse.token)) {
+          localStorage.setItem("token", loginResponse.token);
+          setIsLoggedIn(true);
+          toast.success("You're now logged in!");
+          if (onSuccess) {
+            onSuccess(loginResponse.token);
+          }
+        }
       }
       onOpenChange(false);
     } catch (error: any) {
