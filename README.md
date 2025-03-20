@@ -28,13 +28,13 @@
 
 2. **Backend Setup**
    ```bash
-   cd backend
+   cd ph-backend
    mvn install
    ```
 
 3. **Frontend Setup**
    ```bash
-   cd frontend
+   cd ph-frontend
    npm install
    npm run dev
    ```
