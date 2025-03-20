@@ -6,12 +6,12 @@
 
 ## Features
 
-✅ **User Authentication**: Secure JWT-based login and registration.
-✅ **Project Management**: Upload, edit, and manage projects with ease.
-✅ **Upvote System**: Toggle-based upvoting for user interaction.
-✅ **Responsive UI**: Sleek, mobile-friendly interface built with React.
+**User Authentication**: Secure JWT-based login and registration.
+**Project Management**: Upload, edit, and manage projects with ease.
+**Upvote System**: Toggle-based upvoting for user interaction.
+**Responsive UI**: Sleek, mobile-friendly interface built with React.
 
-## 🛠Tech Stack
+## Tech Stack
 
 - **Frontend:** React.js with Axios for API communication and TailwindCSS.
 - **Backend:** Spring Boot for robust business logic.
